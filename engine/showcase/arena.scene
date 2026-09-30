@@ -1,0 +1,46 @@
+# yarlib scene v1
+# The arena as data. Edit this while arena2 runs; it reloads.
+entity ship
+  transform 384 209 32 32 0
+  velocity 0 0
+  sprite white 102 191 255 255 1
+  collider 32 32 nobounce
+entity spinner
+  transform 68 68 64 64 0
+  sprite checker
+entity b1
+  transform 60 37 14 14
+  velocity 55 -30
+  sprite white 230 41 55 255
+  collider 14 14
+entity b2
+  transform 120 74 16 16
+  velocity -70 41
+  sprite white 0 228 48 255
+  collider 16 16
+entity b3
+  transform 180 111 18 18
+  velocity 85 -52
+  sprite white 253 249 0 255
+  collider 18 18
+entity b4
+  transform 240 148 20 20
+  velocity -100 63
+  sprite white 230 41 55 255
+  collider 20 20
+entity b5
+  transform 300 185 22 22
+  velocity 115 -74
+  sprite white 0 228 48 255
+  collider 22 22
+entity b6
+  transform 360 222 24 24
+  velocity -130 85
+  sprite white 253 249 0 255
+  collider 24 24
+entity spark
+  transform 500 300 6 6
+  velocity 200 -200
+  sprite white 255 255 255 255
+  collider 6 6
+  lifetime 3

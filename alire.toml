@@ -1,0 +1,21 @@
+name = "yarlib"
+description = "Yet another raylib: a flat 2D game library in Ada"
+version = "0.1.0-dev"
+authors = ["Olivier Henley"]
+maintainers = ["Olivier Henley <henley@adacore.com>"]
+maintainers-logins = ["ohenley"]
+licenses = "Apache-2.0"
+website = "https://github.com/GNAT-Academic-Program/yarlib"
+tags = ["game", "graphics", "2d", "sdl3", "opengl", "spark", "gap"]
+
+project-files = ["yarlib.gpr"]
+
+[[depends-on]]
+bedrock = "*"
+
+[[pins]]
+bedrock = { url = "https://github.com/GNAT-Academic-Program/bedrock.git" }
+
+[gpr-externals]
+YARLIB_PLATFORM = ["null", "sdl3"]
+YARLIB_RENDERER = ["software", "opengl"]

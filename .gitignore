@@ -1,0 +1,15 @@
+obj/
+lib/
+bin/
+alire/
+config/
+*.o
+*.ali
+gnatprove/
+*.png
+out.txt
+*.rec
+bad.scene
+empty.scene
+rt.scene
+two.scene

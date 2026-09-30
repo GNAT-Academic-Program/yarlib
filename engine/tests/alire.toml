@@ -1,0 +1,20 @@
+name = "yarlib_engine_tests"
+description = "yarlib engine tests (null platform)"
+executables = ["engine_tests"]
+version = "0.1.0-dev"
+authors = ["Olivier Henley"]
+maintainers = ["Olivier Henley <henley@adacore.com>"]
+maintainers-logins = ["ohenley"]
+licenses = "Apache-2.0"
+
+project-files = ["tests.gpr"]
+
+[[depends-on]]
+yarlib_engine = "*"
+
+[[pins]]
+yarlib_engine = { path = ".." }
+
+[gpr-set-externals]
+YARLIB_PLATFORM = "null"
+YARLIB_RENDERER = "software"

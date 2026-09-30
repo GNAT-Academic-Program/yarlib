@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: alire-project/setup-alire@v4
+      - name: Library (null/software)
+        run: alr -n build
+      - name: Tests
+        run: |
+          cd tests
+          alr -n build
+          ./bin/tests
+      - name: Engine (fetches escape by URL pin)
+        run: |
+          cd engine
+          alr -n build
+          cd tests
+          alr -n build
+          ./bin/engine_tests
+      - name: Layering
+        run: |
+          # Games never reach below the API.
+          ! grep -rEi 'with +Yarlib\.(Batch|Raster|Platform|Renderer)\b' showcase/src engine/showcase/src editor --include='*.ad?'
+          # The library withs neither adi2 nor escape; the engine withs no adi2.
+          ! grep -rEi 'with +(Adi|ECS)\b' src ports --include='*.ad?'
+          ! grep -rEi 'with +Adi\b' engine --include='*.ad?'
+          # C only in the two ports.
+          ! grep -rEi 'pragma +Import|with +Import|Interfaces\.C' src engine/src --include='*.ad?'
+      - name: SDL3 (from source when the runner has no package)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl-dev libx11-dev libxext-dev xvfb
+          if ! sudo apt-get install -y libsdl3-dev; then
+            git clone --depth 1 --branch release-3.2.24 https://github.com/libsdl-org/SDL sdl3
+            cmake -S sdl3 -B sdl3/build -DCMAKE_BUILD_TYPE=Release -DSDL_TEST_LIBRARY=OFF \
+              -DSDL_EXAMPLES=OFF -DSDL_X11=ON -DSDL_OPENGL=ON
+            cmake --build sdl3/build -j"$(nproc)"
+            sudo cmake --install sdl3/build
+            sudo ldconfig
+          fi
+      - name: Showcases open a window under Xvfb, replay a session, and are deterministic
+        run: |
+          cd showcase
+          alr -n build
+          printf '# yarlib replay v1\n0 1 k+KEY_D\n30 1 k-KEY_D\nend 60\n' > right.rec
+          # Exit 1 while the batcher is the placeholder (nothing drawn); flip to 0 at milestone 1.
+          xvfb-run -a ./bin/arena --frames 60 --replay right.rec | tee out.txt \
+            || echo "arena: nothing drawn yet (milestone 1)"
+          grep -q 'ship at 514 209' out.txt
+          test -s shot.png
+          cd ../engine/showcase
+          alr -n build
+          xvfb-run -a ./bin/arena2 arena.scene --frames 60 --replay ../../showcase/right.rec \
+            -c "entities" | tee out.txt
+          grep -q '^arena2: ok' out.txt
+      - name: SPARK flow analysis
+        run: |
+          alr -n with gnatprove
+          alr -n exec -- gnatprove -P yarlib.gpr --mode=flow --checks-as-errors=on

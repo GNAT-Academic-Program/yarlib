@@ -1,0 +1,20 @@
+name = "yarlib_engine_showcase"
+description = "arena2: the arena as a scene file on the engine layer"
+executables = ["arena2"]
+version = "0.1.0-dev"
+authors = ["Olivier Henley"]
+maintainers = ["Olivier Henley <henley@adacore.com>"]
+maintainers-logins = ["ohenley"]
+licenses = "Apache-2.0"
+
+project-files = ["showcase.gpr"]
+
+[[depends-on]]
+yarlib_engine = "*"
+
+[[pins]]
+yarlib_engine = { path = ".." }
+
+[gpr-set-externals]
+YARLIB_PLATFORM = "sdl3"
+YARLIB_RENDERER = "opengl"

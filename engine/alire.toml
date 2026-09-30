@@ -1,0 +1,21 @@
+name = "yarlib_engine"
+description = "Engine layer over yarlib: scenes as text, components, systems"
+version = "0.1.0-dev"
+authors = ["Olivier Henley"]
+maintainers = ["Olivier Henley <henley@adacore.com>"]
+maintainers-logins = ["ohenley"]
+licenses = "Apache-2.0"
+
+project-files = ["yarlib_engine.gpr"]
+
+[[depends-on]]
+yarlib = "*"
+escape = "*"
+
+[[pins]]
+yarlib = { path = ".." }
+escape = { url = "https://github.com/GNAT-Academic-Program/escape.git" }
+#  escape is the ECS capstone's seed. Its pools are a placeholder until
+#  that team's milestone 1 (October); until then entities cannot hold
+#  components and a scene loads empty. See README.md, "The escape
+#  dependency".
