@@ -24,15 +24,18 @@ library project Yarlib is
 
    package Compiler is
       for Default_Switches ("Ada") use
-        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa",
-         "-gnatyg", "-gnatyM100", "-g", "-O2", "-fstack-check");
+      ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa",
+         "-gnatyg", "-gnatyM100", "-gnaty-d",
+         "-g", "-O2", "-fstack-check");
+
       --  The rasterizer's inner loop is float arithmetic per pixel;
       --  -gnatVa (validity checks on every float read) makes it 25x
       --  slower, 220 ms for a full-screen quad. Measured, not guessed.
       --  Everything else keeps the checks.
       for Switches ("yarlib-raster.adb") use
-        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVn",
-         "-gnatyg", "-gnatyM100", "-g", "-O2", "-fstack-check");
+      ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVn",
+         "-gnatyg", "-gnatyM100", "-gnaty-d",
+         "-g", "-O2", "-fstack-check");
    end Compiler;
 
    package Linker is
