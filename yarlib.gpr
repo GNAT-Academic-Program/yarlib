@@ -1,10 +1,15 @@
 with "bedrock";
+with "config/yarlib_config.gpr";
 
 library project Yarlib is
 
    type Platform_Kind is ("null", "sdl3");
    type Renderer_Kind is ("software", "opengl");
-   Platform : Platform_Kind := external ("YARLIB_PLATFORM", "null");
+
+
+   Platform : Platform_Kind := external ("YARLIB_PLATFORM", "sdl3");
+
+
    Renderer : Renderer_Kind := external ("YARLIB_RENDERER", "software");
    --  null/software needs nothing and is what the tests use: no window,
    --  frames rendered into memory and readable back.
@@ -18,21 +23,24 @@ library project Yarlib is
    for Library_Kind use "static";
 
    for Source_Dirs use ("src", "ports/platform/" & Platform, "ports/renderer/" & Renderer);
+
    for Object_Dir use "obj/" & Platform & "-" & Renderer;
    for Library_Dir use "lib/" & Platform & "-" & Renderer;
    for Create_Missing_Dirs use "True";
 
    package Compiler is
+      --  Warnings, style checks, assertions, validity checks and debug
+      --  info come from the Alire build profile (see [build-switches]
+      --  in alire.toml). Only project-specific switches are added here.
       for Default_Switches ("Ada") use
-        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa",
-         "-gnatyg", "-gnatyM100", "-g", "-O2", "-fstack-check");
+         Yarlib_Config.Ada_Compiler_Switches & ("-gnat2022", "-fstack-check");
+
       --  The rasterizer's inner loop is float arithmetic per pixel;
       --  -gnatVa (validity checks on every float read) makes it 25x
       --  slower, 220 ms for a full-screen quad. Measured, not guessed.
-      --  Everything else keeps the checks.
+      --  -gnatVn is placed last so it overrides the profile's -gnatVa.
       for Switches ("yarlib-raster.adb") use
-        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVn",
-         "-gnatyg", "-gnatyM100", "-g", "-O2", "-fstack-check");
+         Yarlib_Config.Ada_Compiler_Switches & ("-gnat2022", "-fstack-check", "-gnatVn");
    end Compiler;
 
    package Linker is

@@ -28,11 +28,9 @@ generic
 package Yarlib.Game_Loop is
 
    procedure Run
-     (Ctx        : in out Core.Context;
-      Session    : in out Replay.Session;
-      Fixed_Dt   : Scalar := 1.0 / 60.0;
-      Max_Frames : Natural := 0;
-      Max_Steps_Per_Frame : Positive := 5);
+     (Ctx : in out Core.Context; Session : in out Replay.Session;
+      Fixed_Dt            :    Scalar := 1.0 / 60.0; Max_Frames : Natural := 0;
+      Max_Steps_Per_Frame :        Positive := 5);
    --  Until Window_Should_Close, or Max_Frames frames (0 = no limit).
    --  Steps per frame come from the clock, or from the replay file, or
    --  are exactly 1 when Max_Frames > 0 (headless, deterministic).

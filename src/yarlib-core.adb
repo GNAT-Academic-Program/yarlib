@@ -2,7 +2,8 @@ with Ada.Numerics.Elementary_Functions;
 with Ada.Text_IO;
 with Bedrock.Buffers;
 with Bedrock.Input;
-with Bedrock.Screen; use type Bedrock.Screen.Pixels;
+with Bedrock.Screen;
+use type Bedrock.Screen.Pixels;
 with Yarlib.Renderer;
 with Yarlib.Platform;
 
@@ -21,19 +22,21 @@ package body Yarlib.Core is
 
    function World_To_Screen (Cam : Camera2D; P : Vector2) return Vector2 is
       use Ada.Numerics.Elementary_Functions;
-      Rad : constant Float := Float (Cam.Rotation) * Ada.Numerics.Pi / 180.0;
-      Cs  : constant Scalar := Scalar (Cos (Rad));
-      Sn  : constant Scalar := Scalar (Sin (Rad));
+      Rad : constant Float   := Float (Cam.Rotation) * Ada.Numerics.Pi / 180.0;
+      Cs  : constant Scalar  := Scalar (Cos (Rad));
+      Sn  : constant Scalar  := Scalar (Sin (Rad));
       D   : constant Vector2 := (P - Cam.Target) * Cam.Zoom;
    begin
-      return (Cam.Offset.X + D.X * Cs - D.Y * Sn, Cam.Offset.Y + D.X * Sn + D.Y * Cs);
+      return
+        (Cam.Offset.X + D.X * Cs - D.Y * Sn,
+         Cam.Offset.Y + D.X * Sn + D.Y * Cs);
    end World_To_Screen;
 
    function Screen_To_World (Cam : Camera2D; P : Vector2) return Vector2 is
       use Ada.Numerics.Elementary_Functions;
-      Rad : constant Float := Float (Cam.Rotation) * Ada.Numerics.Pi / 180.0;
-      Cs  : constant Scalar := Scalar (Cos (Rad));
-      Sn  : constant Scalar := Scalar (Sin (Rad));
+      Rad : constant Float   := Float (Cam.Rotation) * Ada.Numerics.Pi / 180.0;
+      Cs  : constant Scalar  := Scalar (Cos (Rad));
+      Sn  : constant Scalar  := Scalar (Sin (Rad));
       D   : constant Vector2 := P - Cam.Offset;
       U   : constant Vector2 := (D.X * Cs + D.Y * Sn, -D.X * Sn + D.Y * Cs);
    begin
@@ -44,22 +47,24 @@ package body Yarlib.Core is
    -- Init_Window --
    -----------------
 
-   procedure Init_Window (Ctx : in out Context; Width, Height : Positive; Title : String) is
+   procedure Init_Window
+     (Ctx : in out Context; Width, Height : Positive; Title : String)
+   is
       Ok : Boolean;
    begin
       Platform.Open (Width, Height, Title, Ok);
       if not Ok then
          raise Program_Error with "yarlib: cannot open a window";
       end if;
-      Ctx.Width := Width;
+      Ctx.Width  := Width;
       Ctx.Height := Height;
       Renderer.Init (Width, Height);
       Batch.Reset (Ctx.B);
       Ctx.In_State := (others => <>);
       Bedrock.Input.Clear (Ctx.Pending);
       Bedrock.Input.Clear (Ctx.Applied);
-      Ctx.Frames := 0;
-      Ctx.Open := True;
+      Ctx.Frames    := 0;
+      Ctx.Open      := True;
       Ctx.Last_Tick := Platform.Now;
       Ctx.FPS_Since := Ctx.Last_Tick;
    end Init_Window;
@@ -79,7 +84,8 @@ package body Yarlib.Core is
       end if;
       if Batch.Dropped > 0 then
          Ada.Text_IO.Put_Line
-           ("yarlib: batch dropped" & Batch.Dropped'Image & " quads (milestone 1 not done)");
+           ("yarlib: batch dropped" & Batch.Dropped'Image &
+            " quads (milestone 1 not done)");
          Batch.Dropped := 0;
       end if;
    end Close_Window;
@@ -127,7 +133,7 @@ package body Yarlib.Core is
            and then Ctx.Pending.Events (I).Size.Width > 0
            and then Ctx.Pending.Events (I).Size.Height > 0
          then
-            Ctx.Width := Positive (Ctx.Pending.Events (I).Size.Width);
+            Ctx.Width  := Positive (Ctx.Pending.Events (I).Size.Width);
             Ctx.Height := Positive (Ctx.Pending.Events (I).Size.Height);
             Renderer.Resize (Ctx.Width, Ctx.Height);
          end if;
@@ -139,22 +145,23 @@ package body Yarlib.Core is
          if Ctx.From_Platform then
             Input.Apply (Ctx.In_State, E);
             Bedrock.Input.Push (Ctx.Applied, E);
-            if E.Kind = Bedrock.Input.Window_Resized
-              and then E.Size.Width > 0 and then E.Size.Height > 0
+            if E.Kind = Bedrock.Input.Window_Resized and then E.Size.Width > 0
+              and then E.Size.Height > 0
             then
-               Ctx.Width := Positive (E.Size.Width);
+               Ctx.Width  := Positive (E.Size.Width);
                Ctx.Height := Positive (E.Size.Height);
                Renderer.Resize (Ctx.Width, Ctx.Height);
             end if;
          elsif E.Kind = Bedrock.Input.Quit then
-            Ctx.In_State.Quit_Requested := True;   --  the window's X always works
+            Ctx.In_State.Quit_Requested :=
+              True;   --  the window's X always works
          end if;
       end loop;
-      Ctx.Frames := Ctx.Frames + 1;
-      Now := Platform.Now;
+      Ctx.Frames     := Ctx.Frames + 1;
+      Now            := Platform.Now;
       Ctx.Frame_Time := Scalar (Now - Ctx.Last_Tick);
-      Ctx.Last_Tick := Now;
-      Ctx.FPS_Count := Ctx.FPS_Count + 1;
+      Ctx.Last_Tick  := Now;
+      Ctx.FPS_Count  := Ctx.FPS_Count + 1;
       if Now - Ctx.FPS_Since >= 1.0 then
          Ctx.FPS_Value := Ctx.FPS_Count;
          Ctx.FPS_Count := 0;
@@ -164,7 +171,7 @@ package body Yarlib.Core is
 
    procedure Begin_Mode_2D (Ctx : in out Context; Cam : Camera2D) is
    begin
-      Ctx.Cam := Cam;
+      Ctx.Cam        := Cam;
       Ctx.Cam_Active := True;
    end Begin_Mode_2D;
 
@@ -189,22 +196,27 @@ package body Yarlib.Core is
    -- Input --
    -----------
 
-   function Is_Key_Down (Ctx : Context; K : Key) return Boolean is (Ctx.In_State.Down (K));
+   function Is_Key_Down (Ctx : Context; K : Key) return Boolean is
+     (Ctx.In_State.Down (K));
    function Is_Key_Pressed (Ctx : Context; K : Key) return Boolean is
      (Ctx.In_State.Pressed (K));
    function Is_Key_Released (Ctx : Context; K : Key) return Boolean is
      (Ctx.In_State.Released (K));
-   function Is_Mouse_Button_Down (Ctx : Context; B : Mouse_Button) return Boolean is
+   function Is_Mouse_Button_Down
+     (Ctx : Context; B : Mouse_Button) return Boolean is
      (Ctx.In_State.Button_Down (B));
-   function Is_Mouse_Button_Pressed (Ctx : Context; B : Mouse_Button) return Boolean is
+   function Is_Mouse_Button_Pressed
+     (Ctx : Context; B : Mouse_Button) return Boolean is
      (Ctx.In_State.Button_Pressed (B));
    function Get_Mouse_Position (Ctx : Context) return Vector2 is
      ((Scalar (Ctx.In_State.Mouse_X), Scalar (Ctx.In_State.Mouse_Y)));
    function Get_Mouse_World (Ctx : Context) return Vector2 is
-     (if Ctx.Cam_Active then Screen_To_World (Ctx.Cam, Get_Mouse_Position (Ctx))
+     (if Ctx.Cam_Active then
+        Screen_To_World (Ctx.Cam, Get_Mouse_Position (Ctx))
       else Get_Mouse_Position (Ctx));
    function Input_State (Ctx : Context) return Input.State is (Ctx.In_State);
-   function Frame_Events (Ctx : Context) return Input.Event_Queue is (Ctx.Applied);
+   function Frame_Events (Ctx : Context) return Input.Event_Queue is
+     (Ctx.Applied);
    function Frame_Number (Ctx : Context) return Natural is (Ctx.Frames);
 
    procedure Inject (Ctx : in out Context; E : Input.Event) is
@@ -212,7 +224,8 @@ package body Yarlib.Core is
       Bedrock.Input.Push (Ctx.Pending, E);
    end Inject;
 
-   procedure Set_Input_Source (Ctx : in out Context; Platform_Events : Boolean) is
+   procedure Set_Input_Source (Ctx : in out Context; Platform_Events : Boolean)
+   is
    begin
       Ctx.From_Platform := Platform_Events;
    end Set_Input_Source;
@@ -235,7 +248,8 @@ package body Yarlib.Core is
    ------------
 
    procedure Submit
-     (Ctx : in out Context; Tex : Texture_Id; P, UV : Batch.Quad_Corners; C : Color)
+     (Ctx : in out Context; Tex : Texture_Id; P, UV : Batch.Quad_Corners;
+      C   :        Color)
    is
       Ok : Boolean;
       Q  : Batch.Quad_Corners := P;
@@ -262,7 +276,8 @@ package body Yarlib.Core is
       Init_Window (The_Default, Width, Height, Title);
    end Init_Window;
    function Window_Is_Open return Boolean is (Window_Is_Open (The_Default));
-   function Window_Should_Close return Boolean is (Window_Should_Close (The_Default));
+   function Window_Should_Close return Boolean is
+     (Window_Should_Close (The_Default));
    procedure Close_Window is
    begin
       Close_Window (The_Default);
@@ -292,14 +307,18 @@ package body Yarlib.Core is
    function Get_Frame_Time return Scalar is (Get_Frame_Time (The_Default));
    function Get_Time return Scalar is (Get_Time (The_Default));
    function Get_FPS return Natural is (Get_FPS (The_Default));
-   function Is_Key_Down (K : Key) return Boolean is (Is_Key_Down (The_Default, K));
-   function Is_Key_Pressed (K : Key) return Boolean is (Is_Key_Pressed (The_Default, K));
-   function Is_Key_Released (K : Key) return Boolean is (Is_Key_Released (The_Default, K));
+   function Is_Key_Down (K : Key) return Boolean is
+     (Is_Key_Down (The_Default, K));
+   function Is_Key_Pressed (K : Key) return Boolean is
+     (Is_Key_Pressed (The_Default, K));
+   function Is_Key_Released (K : Key) return Boolean is
+     (Is_Key_Released (The_Default, K));
    function Is_Mouse_Button_Down (B : Mouse_Button) return Boolean is
      (Is_Mouse_Button_Down (The_Default, B));
    function Is_Mouse_Button_Pressed (B : Mouse_Button) return Boolean is
      (Is_Mouse_Button_Pressed (The_Default, B));
-   function Get_Mouse_Position return Vector2 is (Get_Mouse_Position (The_Default));
+   function Get_Mouse_Position return Vector2 is
+     (Get_Mouse_Position (The_Default));
    function Get_Mouse_World return Vector2 is (Get_Mouse_World (The_Default));
    function Get_Screen_Pixel (X, Y : Natural) return Color is
      (Get_Screen_Pixel (The_Default, X, Y));

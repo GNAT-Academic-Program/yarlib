@@ -43,9 +43,11 @@ package Yarlib.Replay is
 
    function Current_Mode (S : Session) return Mode;
 
-   procedure Start_Recording (S : in out Session; File : String; Ok : out Boolean);
-   procedure Start_Replay (S : in out Session; Ctx : in out Core.Context; File : String;
-                           Ok : out Boolean);
+   procedure Start_Recording
+     (S : in out Session; File : String; Ok : out Boolean);
+   procedure Start_Replay
+     (S  : in out Session; Ctx : in out Core.Context; File : String;
+      Ok :    out Boolean);
    --  Mutes the platform for Ctx. Ok = False: cannot open or bad header.
    procedure Stop (S : in out Session; Ctx : in out Core.Context);
    --  Unmutes the platform.
@@ -54,12 +56,14 @@ package Yarlib.Replay is
    --  Called by Yarlib.Game_Loop once per frame. A game does not.
    ---------------------------------------------------------------------
 
-   procedure Before_Frame (S : in out Session; Ctx : in out Core.Context; Steps : in out Natural);
+   procedure Before_Frame
+     (S : in out Session; Ctx : in out Core.Context; Steps : in out Natural);
    --  Replaying: injects this frame's events into Ctx and overrides
    --  Steps with the recorded count (0 for a frame with no line). At end
    --  of file, stops and requests quit.
 
-   procedure After_Frame (S : in out Session; Ctx : Core.Context; Steps : Natural);
+   procedure After_Frame
+     (S : in out Session; Ctx : Core.Context; Steps : Natural);
    --  Recording: writes the line for the frame just ended.
 
    function Image (E : Input.Event) return String;
@@ -67,10 +71,10 @@ package Yarlib.Replay is
 
 private
 
-   Max_Line : constant := 4096;
+   Max_Line : constant := 4_096;
 
    type Session is limited record
-      M          : Mode := Off;
+      M          : Mode    := Off;
       Opened     : Boolean := False;
       --  next recorded line, parsed
       Have_Next  : Boolean := False;

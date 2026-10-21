@@ -40,7 +40,9 @@
 
 with Bedrock; use Bedrock;
 
-package Yarlib.Batch with SPARK_Mode is
+package Yarlib.Batch with
+  SPARK_Mode
+is
 
    Max_Quads    : constant := 8_192;
    Max_Vertices : constant := Max_Quads * 6;
@@ -49,14 +51,14 @@ package Yarlib.Batch with SPARK_Mode is
    type Vertex is record
       X, Y : Scalar := 0.0;   --  screen pixels, origin top-left, y down
       U, V : Scalar := 0.0;   --  texture coordinates, 0 .. 1
-      C    : Color := White;
+      C    : Color  := White;
    end record;
 
    type Vertex_Index is range 0 .. Max_Vertices;
    type Vertex_Array is array (Vertex_Index range 1 .. Max_Vertices) of Vertex;
 
    type Draw_Call is record
-      Tex   : Texture_Id := White_Texture;
+      Tex   : Texture_Id   := White_Texture;
       First : Vertex_Index := 1;
       Count : Vertex_Index := 0;
    end record;
@@ -67,23 +69,26 @@ package Yarlib.Batch with SPARK_Mode is
    type Batch is record
       Vertex_Count : Vertex_Index := 0;
       Vertices     : Vertex_Array;
-      Call_Count   : Call_Index := 0;
+      Call_Count   : Call_Index   := 0;
       Calls        : Call_Array;
    end record;
 
    function Well_Formed (B : Batch) return Boolean is
      ((for all I in 1 .. B.Call_Count =>
-         B.Calls (I).Count > 0
-         and then B.Calls (I).Count mod 6 = 0
+         B.Calls (I).Count > 0 and then B.Calls (I).Count mod 6 = 0
          and then B.Calls (I).First >= 1
          and then B.Calls (I).First <= B.Vertex_Count
          and then B.Calls (I).Count <= B.Vertex_Count - B.Calls (I).First + 1
-         and then (I = 1 or else B.Calls (I).First
-                                = B.Calls (I - 1).First + B.Calls (I - 1).Count)
-         and then (I = B.Call_Count or else B.Calls (I).Tex /= B.Calls (I + 1).Tex))
-      and then (if B.Call_Count = 0 then B.Vertex_Count = 0
-                else B.Calls (B.Call_Count).First + B.Calls (B.Call_Count).Count
-                     = B.Vertex_Count + 1));
+         and then
+         (I = 1
+          or else B.Calls (I).First =
+            B.Calls (I - 1).First + B.Calls (I - 1).Count)
+         and then
+         (I = B.Call_Count or else B.Calls (I).Tex /= B.Calls (I + 1).Tex))
+      and then
+      (if B.Call_Count = 0 then B.Vertex_Count = 0
+       else B.Calls (B.Call_Count).First + B.Calls (B.Call_Count).Count =
+         B.Vertex_Count + 1));
    --  Calls are non-empty, whole quads, contiguous, tile 1 .. Vertex_Count,
    --  and adjacent calls differ in texture.
 
@@ -91,16 +96,20 @@ package Yarlib.Batch with SPARK_Mode is
    --  P1 top-left, P2 top-right, P3 bottom-right, P4 bottom-left, in
    --  screen space, after any rotation. UVs likewise.
 
-   procedure Reset (B : in out Batch)
-     with Post => B.Vertex_Count = 0 and then B.Call_Count = 0 and then Well_Formed (B);
+   procedure Reset (B : in out Batch) with
+     Post =>
+      B.Vertex_Count = 0 and then B.Call_Count = 0 and then Well_Formed (B);
 
    procedure Push_Quad
-     (B : in out Batch; Tex : Texture_Id; P, UV : Quad_Corners; C : Color; Ok : out Boolean)
-     with Pre  => Well_Formed (B),
-          Post => Well_Formed (B)
-                  and then (if Ok then B.Vertex_Count = B.Vertex_Count'Old + 6
-                            else B.Vertex_Count = B.Vertex_Count'Old
-                                 and then B.Call_Count = B.Call_Count'Old);
+     (B  : in out Batch; Tex : Texture_Id; P, UV : Quad_Corners; C : Color;
+      Ok :    out Boolean) with
+     Pre  => Well_Formed (B),
+     Post =>
+      Well_Formed (B)
+      and then
+      (if Ok then B.Vertex_Count = B.Vertex_Count'Old + 6
+       else B.Vertex_Count = B.Vertex_Count'Old
+         and then B.Call_Count = B.Call_Count'Old);
    --  Ok = False: full (vertices or calls). Caller flushes and retries.
 
    Dropped : Natural := 0;

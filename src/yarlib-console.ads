@@ -24,13 +24,15 @@ with Bedrock.Responses;
 
 package Yarlib.Console is
 
-   Max_Response : constant := 1024;
+   Max_Response : constant := 1_024;
 
    package Responses is new Bedrock.Responses (Max_Response);
    subtype Response is Responses.Response;
    function Image (R : Response) return String renames Responses.Image;
-   procedure Set (R : out Response; Ok : Boolean; Msg : String) renames Responses.Set;
-   procedure Append (R : in out Response; Msg : String) renames Responses.Append;
+   procedure Set (R : out Response; Ok : Boolean; Msg : String) renames
+     Responses.Set;
+   procedure Append (R : in out Response; Msg : String) renames
+     Responses.Append;
 
    type Handler is access procedure (Args : String; R : out Response);
    --  Args is everything after the command name, trimmed.
@@ -38,8 +40,8 @@ package Yarlib.Console is
    Max_Commands : constant := 128;
    Max_Name     : constant := 32;
 
-   procedure Register (Name : String; H : Handler; Help : String := "")
-     with Pre => Name'Length in 1 .. Max_Name;
+   procedure Register (Name : String; H : Handler; Help : String := "") with
+     Pre => Name'Length in 1 .. Max_Name;
    --  Replaces an existing Name. Raises Program_Error when full.
 
    procedure Execute (Line : String; R : out Response);

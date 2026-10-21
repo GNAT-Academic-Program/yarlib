@@ -19,3 +19,9 @@ bedrock = { url = "https://github.com/GNAT-Academic-Program/bedrock.git" }
 [gpr-externals]
 YARLIB_PLATFORM = ["null", "sdl3"]
 YARLIB_RENDERER = ["software", "opengl"]
+
+[build-switches]
+development.style_checks = "no"
+development.compile_checks = "warnings"
+validation.style_checks = "yes"
+validation.compile_checks = "errors"

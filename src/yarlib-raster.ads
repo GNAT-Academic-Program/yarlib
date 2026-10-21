@@ -25,10 +25,11 @@ package Yarlib.Raster is
 
    type Vertex is record
       X, Y, U, V : Scalar := 0.0;
-      C : Color := White;
+      C          : Color  := White;
    end record;
 
-   procedure Fill_Triangle (F : in out Framebuffer; A, B, C : Vertex; T : Image_Access);
+   procedure Fill_Triangle
+     (F : in out Framebuffer; A, B, C : Vertex; T : Image_Access);
    --  T = null: untextured. Colour is vertex colour times texel,
    --  blended over the framebuffer by its alpha.
 

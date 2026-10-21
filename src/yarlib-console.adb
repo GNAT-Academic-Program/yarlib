@@ -1,11 +1,11 @@
 package body Yarlib.Console is
 
    type Entry_Record is record
-      Name   : String (1 .. Max_Name) := [others => ' '];
-      Length : Natural := 0;
-      H      : Handler := null;
-      Help   : String (1 .. 80) := [others => ' '];
-      Help_Length : Natural := 0;
+      Name        : String (1 .. Max_Name) := [others => ' '];
+      Length      : Natural                := 0;
+      H           : Handler                := null;
+      Help        : String (1 .. 80)       := [others => ' '];
+      Help_Length : Natural                := 0;
    end record;
 
    Table : array (1 .. Max_Commands) of Entry_Record;
@@ -26,7 +26,7 @@ package body Yarlib.Console is
    end Find;
 
    procedure Register (Name : String; H : Handler; Help : String := "") is
-      I  : Natural := Find (Name);
+      I  : Natural          := Find (Name);
       HL : constant Natural := Natural'Min (Help'Length, 80);
    begin
       if I = 0 then
@@ -36,13 +36,13 @@ package body Yarlib.Console is
          N := N + 1;
          I := N;
       end if;
-      Table (I).Name := [others => ' '];
+      Table (I).Name                    := [others => ' '];
       Table (I).Name (1 .. Name'Length) := Name;
-      Table (I).Length := Name'Length;
-      Table (I).H := H;
-      Table (I).Help := [others => ' '];
+      Table (I).Length                  := Name'Length;
+      Table (I).H                       := H;
+      Table (I).Help                    := [others => ' '];
       Table (I).Help (1 .. HL) := Help (Help'First .. Help'First + HL - 1);
-      Table (I).Help_Length := HL;
+      Table (I).Help_Length             := HL;
    end Register;
 
    procedure Execute (Line : String; R : out Response) is
@@ -62,7 +62,7 @@ package body Yarlib.Console is
       end loop;
       declare
          Name : constant String := Line (First .. Last - 1);
-         A0   : Natural := Last;
+         A0   : Natural         := Last;
       begin
          while A0 <= Line'Last and then Line (A0) = ' ' loop
             A0 := A0 + 1;
@@ -72,7 +72,9 @@ package body Yarlib.Console is
             for I in 1 .. N loop
                Append (R, " " & Table (I).Name (1 .. Table (I).Length));
                if Table (I).Help_Length > 0 then
-                  Append (R, " (" & Table (I).Help (1 .. Table (I).Help_Length) & ")");
+                  Append
+                    (R,
+                     " (" & Table (I).Help (1 .. Table (I).Help_Length) & ")");
                end if;
             end loop;
             return;
