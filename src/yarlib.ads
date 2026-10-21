@@ -20,10 +20,12 @@
 
 with Bedrock;
 with Bedrock.Buffers;
-with Bedrock.Colors;  use Bedrock.Colors;
-with Bedrock.Input;   use Bedrock.Input;
+with Bedrock.Colors; use Bedrock.Colors;
+with Bedrock.Input;  use Bedrock.Input;
 
-package Yarlib with SPARK_Mode, Pure is
+package Yarlib with
+  SPARK_Mode, Pure
+is
 
    --  Only Color and Key are needed in this spec, hence the two use
    --  clauses above. Children with/use Bedrock themselves for the
@@ -44,8 +46,8 @@ package Yarlib with SPARK_Mode, Pure is
 
    type Texture is record
       Id     : Texture_Id := White_Texture;
-      Width  : Positive := 1;
-      Height : Positive := 1;
+      Width  : Positive   := 1;
+      Height : Positive   := 1;
    end record;
 
    No_Tint : Color renames White;

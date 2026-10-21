@@ -23,8 +23,8 @@ package Yarlib.Renderer is
    procedure Create_Texture (Img : Bitmap; T : out Texture; Ok : out Boolean);
    --  Ok = False: table full.
 
-   procedure Draw (B : Batch.Batch)
-     with Pre => Batch.Well_Formed (B);
+   procedure Draw (B : Batch.Batch) with
+     Pre => Batch.Well_Formed (B);
    --  Draws every call, in order, with its texture.
 
    function Read_Pixel (X, Y : Natural) return Color;

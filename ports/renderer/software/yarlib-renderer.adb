@@ -11,18 +11,20 @@ package body Yarlib.Renderer is
    use type Raster.Image_Access;
    use type Batch.Vertex_Index;
 
-   procedure Free is new Ada.Unchecked_Deallocation (Bedrock.Buffers.Image, Raster.Image_Access);
+   procedure Free is new Ada.Unchecked_Deallocation
+     (Bedrock.Buffers.Image, Raster.Image_Access);
 
    FB       : Raster.Image_Access;
    Images   : Raster.Image_Table := [others => null];
-   Next_Tex : Natural := 1;
+   Next_Tex : Natural            := 1;
 
    procedure Init (Width, Height : Positive) is
    begin
       Resize (Width, Height);
       --  Texture 0: 1x1 white.
       if Images (White_Texture) = null then
-         Images (White_Texture) := new Bedrock.Buffers.Image'(Make (1, 1, White));
+         Images (White_Texture) :=
+           new Bedrock.Buffers.Image'(Make (1, 1, White));
       end if;
    end Init;
 
@@ -39,17 +41,20 @@ package body Yarlib.Renderer is
       Fill (FB.all, C);
    end Clear;
 
-   procedure Create_Texture (Img : Bitmap; T : out Texture; Ok : out Boolean) is
+   procedure Create_Texture (Img : Bitmap; T : out Texture; Ok : out Boolean)
+   is
    begin
       if Next_Tex > Natural (Texture_Id'Last) then
-         T := (others => <>);
+         T  := (others => <>);
          Ok := False;
          return;
       end if;
       Images (Texture_Id (Next_Tex)) := new Bedrock.Buffers.Image'(Img);
-      T := (Id => Texture_Id (Next_Tex), Width => Width (Img), Height => Height (Img));
-      Next_Tex := Next_Tex + 1;
-      Ok := True;
+      T                              :=
+        (Id     => Texture_Id (Next_Tex), Width => Width (Img),
+         Height => Height (Img));
+      Next_Tex                       := Next_Tex + 1;
+      Ok                             := True;
    end Create_Texture;
 
    procedure Draw (B : Batch.Batch) is
@@ -61,7 +66,7 @@ package body Yarlib.Renderer is
             Call : Batch.Draw_Call renames B.Calls (I);
             Img  : constant Raster.Image_Access :=
               (if Call.Tex = White_Texture then null else Images (Call.Tex));
-            J    : Batch.Vertex_Index := Call.First;
+            J    : Batch.Vertex_Index           := Call.First;
          begin
             while J + 2 <= Call.First + Call.Count - 1 loop
                Raster.Fill_Triangle

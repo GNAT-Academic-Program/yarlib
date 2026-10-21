@@ -91,10 +91,11 @@ package body Yarlib.Renderer is
    procedure Draw (B : Batch.Batch) is
       Base : constant System.Address := B.Vertices (1)'Address;
       use type System.Address;
-      use type System.Storage_Elements.Storage_Offset;
+      use System.Storage_Elements;
    begin
       glVertexPointer (2, GL_FLOAT, Stride, Base);
       glTexCoordPointer (2, GL_FLOAT, Stride, Base + 8);
+
       glColorPointer (4, GL_UNSIGNED_BYTE, Stride, Base + 16);
       for I in 1 .. B.Call_Count loop
          glBindTexture (GL_TEXTURE_2D, Ids (B.Calls (I).Tex));

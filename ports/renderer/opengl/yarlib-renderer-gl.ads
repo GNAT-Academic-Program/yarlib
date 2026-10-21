@@ -11,9 +11,9 @@ private package Yarlib.Renderer.GL is
 
    use Interfaces.C;
 
-   subtype Enum is unsigned;
-   subtype Sizei is int;
-   subtype Bitfield is unsigned;
+   subtype Enum is Interfaces.C.unsigned;
+   subtype Sizei is Interfaces.C.int;
+   subtype Bitfield is Interfaces.C.unsigned;
 
    GL_TRIANGLES        : constant Enum := 16#0004#;
    GL_TEXTURE_2D       : constant Enum := 16#0DE1#;
@@ -72,8 +72,21 @@ private package Yarlib.Renderer.GL is
      with Import, Convention => C, External_Name => "glEnableClientState";
    procedure glVertexPointer (Size : int; Kind : Enum; Stride : Sizei; P : System.Address)
      with Import, Convention => C, External_Name => "glVertexPointer";
-   procedure glTexCoordPointer (Size : int; Kind : Enum; Stride : Sizei; P : System.Address)
-     with Import, Convention => C, External_Name => "glTexCoordPointer";
+
+
+
+   procedure glTexCoordPointer (Size   : int; 
+                                Kind   : Enum; 
+                                Stride : Sizei; 
+                                P      : System.Address)
+
+     with Import, 
+          Convention    => C, 
+          External_Name => "glTexCoordPointer";
+
+
+
+
    procedure glColorPointer (Size : int; Kind : Enum; Stride : Sizei; P : System.Address)
      with Import, Convention => C, External_Name => "glColorPointer";
    procedure glDrawArrays (Mode : Enum; First : int; Count : Sizei)

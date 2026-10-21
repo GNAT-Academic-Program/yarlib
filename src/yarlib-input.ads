@@ -6,20 +6,24 @@
 
 with Bedrock.Input;
 
-package Yarlib.Input with SPARK_Mode is
+package Yarlib.Input with
+  SPARK_Mode
+is
 
    subtype Event is Bedrock.Input.Event;
    subtype Event_Queue is Bedrock.Input.Event_Queue;
 
    type State is record
-      Down, Pressed, Released : Key_Set := [others => False];
-      Button_Down, Button_Pressed, Button_Released : Button_State := [others => False];
-      Mouse_X, Mouse_Y : Integer := 0;
-      Quit_Requested : Boolean := False;
+      Down, Pressed, Released : Key_Set      := [others => False];
+      Button_Down, Button_Pressed, Button_Released : Button_State :=
+        [others => False];
+      Mouse_X, Mouse_Y                             : Integer      := 0;
+      Quit_Requested                               : Boolean      := False;
    end record;
 
-   procedure Begin_Frame (S : in out State)
-     with Post => (for all K in Key => not S.Pressed (K) and then not S.Released (K));
+   procedure Begin_Frame (S : in out State) with
+     Post =>
+      (for all K in Key => not S.Pressed (K) and then not S.Released (K));
    --  Clears the per-frame edges; Down persists.
 
    procedure Apply (S : in out State; E : Event);

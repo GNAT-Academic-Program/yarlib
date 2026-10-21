@@ -33,18 +33,19 @@ package Yarlib.Core is
       Offset   : Vector2 := (0.0, 0.0);   --  where Target lands on screen
       Target   : Vector2 := (0.0, 0.0);   --  world point under Offset
       Rotation : Degrees := 0.0;
-      Zoom     : Scalar := 1.0;
+      Zoom     : Scalar  := 1.0;
    end record;
 
    function World_To_Screen (Cam : Camera2D; P : Vector2) return Vector2;
-   function Screen_To_World (Cam : Camera2D; P : Vector2) return Vector2
-     with Pre => Cam.Zoom /= 0.0;
+   function Screen_To_World (Cam : Camera2D; P : Vector2) return Vector2 with
+     Pre => Cam.Zoom /= 0.0;
 
    ---------------------------------------------------------------------
    --  Window and frame
    ---------------------------------------------------------------------
 
-   procedure Init_Window (Ctx : in out Context; Width, Height : Positive; Title : String);
+   procedure Init_Window
+     (Ctx : in out Context; Width, Height : Positive; Title : String);
    --  Raises Program_Error if the platform cannot open a window. One
    --  window per process on every port so far; a second Context on the
    --  same window (the editor's viewport) shares the platform and gets
@@ -71,7 +72,8 @@ package Yarlib.Core is
    ---------------------------------------------------------------------
 
    function Get_Frame_Time (Ctx : Context) return Scalar;   --  seconds
-   function Get_Time (Ctx : Context) return Scalar;         --  since Init_Window
+   function Get_Time
+     (Ctx : Context) return Scalar;         --  since Init_Window
    function Get_FPS (Ctx : Context) return Natural;
 
    ---------------------------------------------------------------------
@@ -81,10 +83,13 @@ package Yarlib.Core is
    function Is_Key_Down (Ctx : Context; K : Key) return Boolean;
    function Is_Key_Pressed (Ctx : Context; K : Key) return Boolean;
    function Is_Key_Released (Ctx : Context; K : Key) return Boolean;
-   function Is_Mouse_Button_Down (Ctx : Context; B : Mouse_Button) return Boolean;
-   function Is_Mouse_Button_Pressed (Ctx : Context; B : Mouse_Button) return Boolean;
+   function Is_Mouse_Button_Down
+     (Ctx : Context; B : Mouse_Button) return Boolean;
+   function Is_Mouse_Button_Pressed
+     (Ctx : Context; B : Mouse_Button) return Boolean;
    function Get_Mouse_Position (Ctx : Context) return Vector2;   --  screen
-   function Get_Mouse_World (Ctx : Context) return Vector2;      --  through the camera
+   function Get_Mouse_World
+     (Ctx : Context) return Vector2;      --  through the camera
 
    function Input_State (Ctx : Context) return Input.State;
    --  The whole frame's input as a value.
@@ -100,15 +105,16 @@ package Yarlib.Core is
    --  Delivered at the next End_Drawing, before the platform's events.
    --  Tests and Replay use it; a game does not.
 
-   procedure Set_Input_Source (Ctx : in out Context; Platform_Events : Boolean);
+   procedure Set_Input_Source
+     (Ctx : in out Context; Platform_Events : Boolean);
    --  False: ignore the platform, only injected events count. Replay.
 
    ---------------------------------------------------------------------
    --  Screen readback
    ---------------------------------------------------------------------
 
-   function Get_Screen_Pixel (Ctx : Context; X, Y : Natural) return Color
-     with Pre => X < Screen_Width (Ctx) and then Y < Screen_Height (Ctx);
+   function Get_Screen_Pixel (Ctx : Context; X, Y : Natural) return Color with
+     Pre => X < Screen_Width (Ctx) and then Y < Screen_Height (Ctx);
    --  One pixel of the last frame. For tests. On a GPU this is a driver
    --  round trip; do not loop over a frame with it.
 
@@ -120,7 +126,8 @@ package Yarlib.Core is
    ---------------------------------------------------------------------
 
    procedure Submit
-     (Ctx : in out Context; Tex : Texture_Id; P, UV : Batch.Quad_Corners; C : Color);
+     (Ctx : in out Context; Tex : Texture_Id; P, UV : Batch.Quad_Corners;
+      C   :        Color);
    --  Applies the camera if one is active, pushes the quad, flushes
    --  and retries if the batch is full.
 
@@ -156,22 +163,22 @@ package Yarlib.Core is
 private
 
    type Context is limited record
-      Open        : Boolean := False;
-      Width       : Positive := 1;
-      Height      : Positive := 1;
-      B           : Batch.Batch;
-      In_State    : Input.State;
-      Pending     : Input.Event_Queue;
-      From_Platform : Boolean := True;
-      Applied     : Input.Event_Queue;
-      Frames      : Natural := 0;
-      Cam         : Camera2D;
-      Cam_Active  : Boolean := False;
-      Frame_Time  : Scalar := 0.0;
-      Last_Tick   : Duration := 0.0;
-      FPS_Count   : Natural := 0;
-      FPS_Value   : Natural := 0;
-      FPS_Since   : Duration := 0.0;
+      Open          : Boolean  := False;
+      Width         : Positive := 1;
+      Height        : Positive := 1;
+      B             : Batch.Batch;
+      In_State      : Input.State;
+      Pending       : Input.Event_Queue;
+      From_Platform : Boolean  := True;
+      Applied       : Input.Event_Queue;
+      Frames        : Natural  := 0;
+      Cam           : Camera2D;
+      Cam_Active    : Boolean  := False;
+      Frame_Time    : Scalar   := 0.0;
+      Last_Tick     : Duration := 0.0;
+      FPS_Count     : Natural  := 0;
+      FPS_Value     : Natural  := 0;
+      FPS_Since     : Duration := 0.0;
    end record;
 
    type Context_Access is not null access all Context;

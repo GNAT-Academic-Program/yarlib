@@ -21,14 +21,22 @@ package body Yarlib.Replay is
    function Image (E : Input.Event) return String is
    begin
       case E.Kind is
-         when Quit | Window_Close => return "q";
-         when Key_Down       => return (if E.Repeat then "" else "k+" & E.Key'Image);
-         when Key_Up         => return "k-" & E.Key'Image;
-         when Mouse_Move     => return "m" & E.At_Pos.X'Image & E.At_Pos.Y'Image;
-         when Mouse_Down     => return "b+" & E.Button'Image & E.Where.X'Image & E.Where.Y'Image;
-         when Mouse_Up       => return "b-" & E.Button'Image & E.Where.X'Image & E.Where.Y'Image;
-         when Window_Resized => return "r" & E.Size.Width'Image & E.Size.Height'Image;
-         when others         => return "";   --  not replayed
+         when Quit | Window_Close =>
+            return "q";
+         when Key_Down =>
+            return (if E.Repeat then "" else "k+" & E.Key'Image);
+         when Key_Up =>
+            return "k-" & E.Key'Image;
+         when Mouse_Move =>
+            return "m" & E.At_Pos.X'Image & E.At_Pos.Y'Image;
+         when Mouse_Down =>
+            return "b+" & E.Button'Image & E.Where.X'Image & E.Where.Y'Image;
+         when Mouse_Up =>
+            return "b-" & E.Button'Image & E.Where.X'Image & E.Where.Y'Image;
+         when Window_Resized =>
+            return "r" & E.Size.Width'Image & E.Size.Height'Image;
+         when others =>
+            return "";   --  not replayed
       end case;
    end Image;
 
@@ -42,18 +50,22 @@ package body Yarlib.Replay is
       if Tok = "q" then
          E := Quit_Event;
       elsif Tok'Length > 2 and then Tok (Tok'First) = 'k' then
-         E := Key_Event (Key'Value (Tok (Tok'First + 2 .. Tok'Last)),
-                         Down => Tok (Tok'First + 1) = '+');
+         E :=
+           Key_Event
+             (Key'Value (Tok (Tok'First + 2 .. Tok'Last)),
+              Down => Tok (Tok'First + 1) = '+');
       elsif Tok'Length > 2 and then Tok (Tok'First) = 'b' then
-         E := Button_Event (Mouse_Button'Value (Tok (Tok'First + 2 .. Tok'Last)),
-                            Down => Tok (Tok'First + 1) = '+');
+         E :=
+           Button_Event
+             (Mouse_Button'Value (Tok (Tok'First + 2 .. Tok'Last)),
+              Down => Tok (Tok'First + 1) = '+');
       else
-         E := Quit_Event;
+         E  := Quit_Event;
          Ok := False;
       end if;
    exception
       when Constraint_Error =>
-         E := Quit_Event;
+         E  := Quit_Event;
          Ok := False;
    end Value;
 
@@ -67,8 +79,8 @@ package body Yarlib.Replay is
       S.Have_Next := False;
       while not End_Of_File (F) loop
          declare
-            L    : constant String := Get_Line (F);
-            P    : Natural := L'First;
+            L : constant String := Get_Line (F);
+            P : Natural         := L'First;
             function Next_Token return String;
             function Next_Token return String is
                Start : Natural;
@@ -92,11 +104,12 @@ package body Yarlib.Replay is
                      S.End_Frame := Natural'Value (T2);
                      return;
                   elsif T1'Length > 0 and then T2'Length > 0 then
-                     S.Next_Frame := Natural'Value (T1);
-                     S.Next_Steps := Natural'Value (T2);
+                     S.Next_Frame                   := Natural'Value (T1);
+                     S.Next_Steps                   := Natural'Value (T2);
                      S.Next_Last := Natural'Min (Max_Line, L'Last - P + 1);
-                     S.Next_Line (1 .. S.Next_Last) := L (P .. P + S.Next_Last - 1);
-                     S.Have_Next := True;
+                     S.Next_Line (1 .. S.Next_Last) :=
+                       L (P .. P + S.Next_Last - 1);
+                     S.Have_Next                    := True;
                      return;
                   end if;
                end;
@@ -112,7 +125,9 @@ package body Yarlib.Replay is
    -- Start_Recording --
    ---------------------
 
-   procedure Start_Recording (S : in out Session; File : String; Ok : out Boolean) is
+   procedure Start_Recording
+     (S : in out Session; File : String; Ok : out Boolean)
+   is
    begin
       Ok := False;
       if S.M /= Off then
@@ -121,9 +136,9 @@ package body Yarlib.Replay is
       S.Handle := 1;
       Create (Files (1), Out_File, File);
       Put_Line (Files (1), "# yarlib replay v1");
-      S.M := Recording;
+      S.M      := Recording;
       S.Opened := True;
-      Ok := True;
+      Ok       := True;
    exception
       when others =>
          Ok := False;
@@ -133,8 +148,10 @@ package body Yarlib.Replay is
    -- Start_Replay --
    ------------------
 
-   procedure Start_Replay (S : in out Session; Ctx : in out Core.Context; File : String;
-                           Ok : out Boolean) is
+   procedure Start_Replay
+     (S  : in out Session; Ctx : in out Core.Context; File : String;
+      Ok :    out Boolean)
+   is
    begin
       Ok := False;
       if S.M /= Off then
@@ -150,7 +167,7 @@ package body Yarlib.Replay is
             return;
          end if;
       end;
-      S.M := Replaying;
+      S.M      := Replaying;
       S.Opened := True;
       Core.Set_Input_Source (Ctx, Platform_Events => False);
       Read_Next (S);
@@ -183,7 +200,8 @@ package body Yarlib.Replay is
    -- Before_Frame --
    ------------------
 
-   procedure Before_Frame (S : in out Session; Ctx : in out Core.Context; Steps : in out Natural)
+   procedure Before_Frame
+     (S : in out Session; Ctx : in out Core.Context; Steps : in out Natural)
    is
    begin
       if S.M /= Replaying then
@@ -202,7 +220,7 @@ package body Yarlib.Replay is
       Steps := S.Next_Steps;
       declare
          L : constant String := S.Next_Line (1 .. S.Next_Last);
-         P : Natural := L'First;
+         P : Natural         := L'First;
          function Next_Token return String;
          function Next_Token return String is
             Start : Natural;
@@ -229,14 +247,17 @@ package body Yarlib.Replay is
                      X : constant String := Next_Token;
                      Y : constant String := Next_Token;
                   begin
-                     Core.Inject (Ctx, Move_Event (Pixels'Value (X), Pixels'Value (Y)));
+                     Core.Inject
+                       (Ctx, Move_Event (Pixels'Value (X), Pixels'Value (Y)));
                   end;
                elsif T = "r" then
                   declare
                      W : constant String := Next_Token;
                      H : constant String := Next_Token;
                   begin
-                     Core.Inject (Ctx, Resize_Event (Extent'Value (W), Extent'Value (H)));
+                     Core.Inject
+                       (Ctx,
+                        Resize_Event (Extent'Value (W), Extent'Value (H)));
                   end;
                elsif T'Length > 2 and then T (T'First) = 'b' then
                   declare
@@ -244,9 +265,11 @@ package body Yarlib.Replay is
                      Y : constant String := Next_Token;
                   begin
                      Core.Inject
-                       (Ctx, Button_Event (Mouse_Button'Value (T (T'First + 2 .. T'Last)),
-                                           Down => T (T'First + 1) = '+',
-                                           X => Pixels'Value (X), Y => Pixels'Value (Y)));
+                       (Ctx,
+                        Button_Event
+                          (Mouse_Button'Value (T (T'First + 2 .. T'Last)),
+                           Down => T (T'First + 1) = '+',
+                           X    => Pixels'Value (X), Y => Pixels'Value (Y)));
                   end;
                else
                   Value (T, E, Ok);
@@ -267,7 +290,9 @@ package body Yarlib.Replay is
    -- After_Frame --
    -----------------
 
-   procedure After_Frame (S : in out Session; Ctx : Core.Context; Steps : Natural) is
+   procedure After_Frame
+     (S : in out Session; Ctx : Core.Context; Steps : Natural)
+   is
       Q : constant Input.Event_Queue := Core.Frame_Events (Ctx);
    begin
       if S.M /= Recording then
